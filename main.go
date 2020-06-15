@@ -1,5 +1,7 @@
 package main
 
-func main() {
+import "github.com/flucas97/bookstore/users-api/app"
 
+func main() {
+	app.StartApplication()
 }
