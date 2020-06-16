@@ -1,13 +1,13 @@
 package app
 
 import (
-	c "github.com/flucas97/bookstore/users-api/controllers"
+	ping_controller "github.com/flucas97/bookstore/users-api/controllers/ping"
+	users_controller "github.com/flucas97/bookstore/users-api/controllers/users"
 )
 
-func MapUrl() {
-	router.GET("/ping", c.Ping)
+func MapURL() {
+	router.GET("/ping", ping_controller.Ping)
 
-	router.POST("/users", c.CreateUser)
-	router.GET("/user/:user_id", c.FindUser)
-	router.GET("/users/search", c.SearchUser)
+	router.POST("/users", users_controller.CreateUser)
+	router.GET("/user/:user_id", users_controller.FindUser)
 }

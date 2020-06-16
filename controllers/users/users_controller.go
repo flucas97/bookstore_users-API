@@ -1,4 +1,4 @@
-package controllers
+package users_controller
 
 import (
 	"net/http"
@@ -7,10 +7,6 @@ import (
 )
 
 func CreateUser(c *gin.Context) {
-	c.String(http.StatusNotImplemented, "Implement me")
-}
-
-func SearchUser(c *gin.Context) {
 	c.String(http.StatusNotImplemented, "Implement me")
 }
 
