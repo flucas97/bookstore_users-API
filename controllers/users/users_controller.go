@@ -1,33 +1,30 @@
 package users_controller
 
 import (
-	"encoding/json"
-	"fmt"
-	"io/ioutil"
 	"net/http"
 
 	"github.com/flucas97/bookstore/users-api/domain/users"
 	"github.com/flucas97/bookstore/users-api/services"
+	"github.com/flucas97/bookstore/users-api/utils"
 	"github.com/gin-gonic/gin"
 )
 
 func CreateUser(c *gin.Context) {
 	var user users.User
 
-	bytes, err := ioutil.ReadAll(c.Request.Body)
-	if err != nil {
-		fmt.Println(err.Error())
-	}
+	// the same way of readall and unmarshall, but shortcut
+	if err := c.ShouldBindJSON(&user); err != nil {
+		restErr := utils.NewBadRequestError("Invalid JSON body")
 
-	err = json.Unmarshal(bytes, &user)
-	if err != nil {
-		fmt.Println(err.Error())
+		c.JSON(restErr.Status, restErr)
+		return
 	}
 
 	result, err := services.CreateUser(user)
 	if err != nil {
-		return
+		c.JSON(err.Status, err)
 	}
+
 	c.JSON(http.StatusCreated, result)
 }
 
