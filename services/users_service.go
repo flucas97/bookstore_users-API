@@ -1,13 +1,12 @@
-package controllers
+package services
 
-func CreateUser() {
+import (
+	"github.com/flucas97/bookstore/users-api/domain/users"
+)
 
-}
-
-func GetUser() {
-
+func CreateUser(u users.User) (*users.User, error) {
+	return &u, nil
 }
 
 func FindUser() {
-
 }
