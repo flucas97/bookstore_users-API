@@ -11,7 +11,7 @@ var (
 )
 
 // Save persist user in database
-func (user User) Save() *utils.RestErr {
+func (user *User) Save() *utils.RestErr {
 	current := usersDB[user.ID]
 	if current != nil {
 		if current.Email == user.Email {
@@ -19,8 +19,8 @@ func (user User) Save() *utils.RestErr {
 		}
 		return utils.NewBadRequestError(fmt.Sprintf("User %v already exists", user.ID))
 	}
-
-	usersDB[user.ID] = &user
+	user.CreatedAt = utils.GetNowString()
+	usersDB[user.ID] = user
 	return nil
 }
 
