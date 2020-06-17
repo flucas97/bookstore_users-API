@@ -2,12 +2,14 @@ package utils
 
 import "net/http"
 
+// RestErr is generic type for error handling inside the application
 type RestErr struct {
 	Message string `json:"message"`
 	Status  int    `json:"status"`
 	Error   string `json:"error"`
 }
 
+// NewBadRequestError returns a new bad request as RestErr struct
 func NewBadRequestError(message string) *RestErr {
 	return &RestErr{
 		Message: message,
@@ -16,6 +18,7 @@ func NewBadRequestError(message string) *RestErr {
 	}
 }
 
+// NewNotFoundError returns a new not found request as RestErr struct
 func NewNotFoundError(message string) *RestErr {
 	return &RestErr{
 		Message: message,
