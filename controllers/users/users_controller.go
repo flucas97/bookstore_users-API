@@ -32,7 +32,7 @@ func CreateUser(c *gin.Context) {
 func FindUser(c *gin.Context) {
 	userID, UserErr := strconv.ParseInt(c.Param("user_id"), 10, 64)
 	if UserErr != nil {
-		err := utils.NewBadRequestError("Invalid ID")
+		err := utils.NewBadRequestError("ID should be a number")
 		c.JSON(err.Status, err)
 		return
 	}
@@ -43,5 +43,6 @@ func FindUser(c *gin.Context) {
 		c.JSON(err.Status, err)
 		return
 	}
-	c.String(http.StatusNotImplemented, "Implement me")
+
+	c.JSON(http.StatusOK, user)
 }

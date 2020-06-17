@@ -17,10 +17,10 @@ func CreateUser(user users.User) (*users.User, *utils.RestErr) {
 }
 
 func FindUser(id int64) (*users.User, *utils.RestErr) {
-	result := users.User{ID: id}
+	result := &users.User{ID: id}
 	if err := result.Find(); err != nil {
 		return nil, err
 	}
 
-	return &result, nil
+	return result, nil
 }
