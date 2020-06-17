@@ -7,21 +7,33 @@ import (
 	"github.com/flucas97/bookstore/users-api/utils"
 )
 
+const (
+	queryInsertUser = ("INSERT INTO users(first_name, last_name, email, created_at) VALUES (?, ?, ?, ?);")
+)
+
 var (
 	usersDB = make(map[int64]*User)
 )
 
 // Save persist user in database
 func (user *User) Save() *utils.RestErr {
-	current := usersDB[user.ID]
-	if current != nil {
-		if current.Email == user.Email {
-			return utils.NewBadRequestError(fmt.Sprintf("User %v already registered", user.Email))
-		}
-		return utils.NewBadRequestError(fmt.Sprintf("User %v already exists", user.ID))
+	stmt, err := users_db.Client.Prepare(queryInsertUser)
+	if err != nil {
+		return utils.NewInternalServerError(fmt.Sprintf("Error: %v", err))
 	}
+	defer stmt.Close() // Close db connection with this statement
+
+	insertResult, err := stmt.Exec(user.FirstName, user.LastName, user.Email, user.CreatedAt)
+	if err != nil {
+		return utils.NewInternalServerError(fmt.Sprintf("error when trying to save user: %s", err.Error))
+	}
+	userID, err := insertResult.LastInsertId()
+	if err != nil {
+		return utils.NewInternalServerError(fmt.Sprintf("error when trying to save user: %s", err.Error))
+	}
+
 	user.CreatedAt = utils.GetNowString()
-	usersDB[user.ID] = user
+	user.ID = userID
 	return nil
 }
 
