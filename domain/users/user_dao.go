@@ -3,6 +3,7 @@ package users
 import (
 	"fmt"
 
+	"github.com/flucas97/bookstore/users-api/datasources/mysql/users_db"
 	"github.com/flucas97/bookstore/users-api/utils"
 )
 
@@ -26,6 +27,11 @@ func (user *User) Save() *utils.RestErr {
 
 // Find gets a user
 func (user *User) Find() *utils.RestErr {
+	// check if is everything OK accessing the DB
+	if err := users_db.Client.Ping(); err != nil {
+		panic(err)
+	}
+
 	result := usersDB[user.ID]
 	if result == nil {
 		return utils.NewNotFoundError(fmt.Sprintf("User %v not found", user.ID))
