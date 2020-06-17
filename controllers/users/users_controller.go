@@ -2,6 +2,7 @@ package users_controller
 
 import (
 	"net/http"
+	"strconv"
 
 	"github.com/flucas97/bookstore/users-api/domain/users"
 	"github.com/flucas97/bookstore/users-api/services"
@@ -29,5 +30,18 @@ func CreateUser(c *gin.Context) {
 }
 
 func FindUser(c *gin.Context) {
+	userID, UserErr := strconv.ParseInt(c.Param("user_id"), 10, 64)
+	if UserErr != nil {
+		err := utils.NewBadRequestError("Invalid ID")
+		c.JSON(err.Status, err)
+		return
+	}
+
+	user, FindErr := services.FindUser(userID)
+	if FindErr != nil {
+		err := utils.NewNotFoundError("User not found")
+		c.JSON(err.Status, err)
+		return
+	}
 	c.String(http.StatusNotImplemented, "Implement me")
 }

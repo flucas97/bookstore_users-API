@@ -33,7 +33,9 @@ func (user *User) Find() *utils.RestErr {
 
 	user.ID = result.ID
 	user.FirstName = result.FirstName
+	user.Email = result.Email
 	user.LastName = result.LastName
+	user.CreatedAt = result.CreatedAt
 
 	return nil
 }

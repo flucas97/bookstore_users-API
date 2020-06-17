@@ -16,5 +16,11 @@ func CreateUser(user users.User) (*users.User, *utils.RestErr) {
 	return &user, nil
 }
 
-func FindUser() {
+func FindUser(id int64) (*users.User, *utils.RestErr) {
+	result := users.User{ID: id}
+	if err := result.Find(); err != nil {
+		return nil, err
+	}
+
+	return &result, nil
 }
