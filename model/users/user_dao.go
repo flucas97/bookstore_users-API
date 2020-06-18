@@ -2,13 +2,16 @@ package users
 
 import (
 	"fmt"
+	"strings"
 
 	"github.com/flucas97/bookstore/users-api/datasources/mysql/users_db"
 	"github.com/flucas97/bookstore/users-api/utils"
 )
 
 const (
-	queryInsertUser = ("INSERT INTO users(first_name, last_name, email, created_at) VALUES (?, ?, ?, ?);")
+	queryInsertUser  = ("INSERT INTO users(first_name, last_name, email, created_at) VALUES (?, ?, ?, ?);")
+	queryFindUser    = ("SELECT * FROM users WHERE id=?;")
+	indexUniqueEmail = "email_UNIQUE"
 )
 
 var (
@@ -25,6 +28,9 @@ func (user *User) Save() *utils.RestErr {
 
 	insertResult, err := stmt.Exec(user.FirstName, user.LastName, user.Email, user.CreatedAt)
 	if err != nil {
+		if strings.Contains(err.Error(), indexUniqueEmail) {
+			return utils.NewBadRequestError(fmt.Sprintf("user: '%v' already registered", user.Email))
+		}
 		return utils.NewInternalServerError(fmt.Sprintf("error when trying to save user: %s", err.Error()))
 	}
 	userID, err := insertResult.LastInsertId()
