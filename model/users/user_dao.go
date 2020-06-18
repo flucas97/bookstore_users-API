@@ -55,7 +55,10 @@ func (user *User) Find() *utils.RestErr {
 	searchResult := stmt.QueryRow(user.ID)
 
 	if err := searchResult.Scan(&user.ID, &user.FirstName, &user.LastName, &user.Email, &user.CreatedAt); err != nil {
-		return utils.NewNotFoundError(fmt.Sprintf("user ID:%v not found", user.ID))
+		if strings.Contains(err.Error(), "no rows in result set") {
+			return utils.NewNotFoundError(fmt.Sprintf("user ID:%v not found", user.ID))
+		}
+		return utils.NewInternalServerError(fmt.Sprintf("error trying to get user %v error: %s", user.ID, err.Error()))
 	}
 
 	return nil
