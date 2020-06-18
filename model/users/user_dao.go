@@ -9,9 +9,9 @@ import (
 )
 
 const (
-	queryInsertUser  = ("INSERT INTO users(first_name, last_name, email, created_at) VALUES (?, ?, ?, ?);")
-	queryFindUser    = ("SELECT id, first_name, last_name, email, created_at FROM users WHERE id=?;")
-	indexUniqueEmail = "email_UNIQUE"
+	queryUpdateUser = ("UPDATE users SET (first_name=?, last_name=?, email=?) WHERE id=?;")
+	queryInsertUser = ("INSERT INTO users(first_name, last_name, email, created_at) VALUES (?, ?, ?, ?);")
+	queryFindUser   = ("SELECT id, first_name, last_name, email, created_at FROM users WHERE id=?;")
 )
 
 // Save persist user in database
@@ -24,11 +24,9 @@ func (user *User) Save() *utils.RestErr {
 
 	insertResult, err := stmt.Exec(user.FirstName, user.LastName, user.Email, user.CreatedAt)
 	if err != nil {
-		if strings.Contains(err.Error(), indexUniqueEmail) {
-			return utils.NewBadRequestError(fmt.Sprintf("user: '%v' already registered", user.Email))
-		}
-		return utils.NewInternalServerError(fmt.Sprintf("error when trying to save user: %s", err.Error()))
+		return utils.ParseError(err)
 	}
+
 	userID, err := insertResult.LastInsertId()
 	if err != nil {
 		return utils.NewInternalServerError(fmt.Sprintf("error when trying to save user: %s", err.Error()))
@@ -61,5 +59,23 @@ func (user *User) Find() *utils.RestErr {
 		return utils.NewInternalServerError(fmt.Sprintf("error trying to get user %v error: %s", user.ID, err.Error()))
 	}
 
+	return nil
+}
+
+// Update a existent user
+func (user *User) Update() *utils.RestErr {
+	// montar a query
+	stmt, err := users_db.Client.Prepare(queryUpdateUser)
+	if err != nil {
+		return utils.NewInternalServerError(fmt.Sprintln("error while preparing search query"))
+	}
+	defer stmt.Close()
+	// executa
+	insertResult, err := stmt.Exec(user.FirstName, user.LastName, user.Email, user.ID)
+	if err != nil {
+		return utils.ParseError(err)
+	}
+
+	user.ID, err = insertResult.LastInsertId()
 	return nil
 }

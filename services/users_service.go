@@ -24,3 +24,11 @@ func FindUser(id int64) (*users.User, *utils.RestErr) {
 
 	return result, nil
 }
+
+func UpdateUser(user *users.User) *utils.RestErr {
+	if err := user.Update(); err != nil {
+		return err
+	}
+
+	return nil
+}
