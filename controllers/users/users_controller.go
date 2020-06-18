@@ -4,7 +4,7 @@ import (
 	"net/http"
 	"strconv"
 
-	"github.com/flucas97/bookstore/users-api/domain/users"
+	"github.com/flucas97/bookstore/users-api/model/users"
 	"github.com/flucas97/bookstore/users-api/services"
 	"github.com/flucas97/bookstore/users-api/utils"
 	"github.com/gin-gonic/gin"

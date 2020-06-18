@@ -25,11 +25,11 @@ func (user *User) Save() *utils.RestErr {
 
 	insertResult, err := stmt.Exec(user.FirstName, user.LastName, user.Email, user.CreatedAt)
 	if err != nil {
-		return utils.NewInternalServerError(fmt.Sprintf("error when trying to save user: %s", err.Error))
+		return utils.NewInternalServerError(fmt.Sprintf("error when trying to save user: %s", err.Error()))
 	}
 	userID, err := insertResult.LastInsertId()
 	if err != nil {
-		return utils.NewInternalServerError(fmt.Sprintf("error when trying to save user: %s", err.Error))
+		return utils.NewInternalServerError(fmt.Sprintf("error when trying to save user: %s", err.Error()))
 	}
 
 	user.CreatedAt = utils.GetNowString()

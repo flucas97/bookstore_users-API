@@ -1,7 +1,12 @@
 package main
 
-import "github.com/flucas97/bookstore/users-api/app"
+import (
+	"log"
+
+	"github.com/flucas97/bookstore/users-api/app"
+)
 
 func main() {
+	log.Print("Starting application...")
 	app.StartApplication()
 }

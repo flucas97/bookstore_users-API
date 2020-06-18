@@ -1,7 +1,7 @@
 package services
 
 import (
-	"github.com/flucas97/bookstore/users-api/domain/users"
+	"github.com/flucas97/bookstore/users-api/model/users"
 	"github.com/flucas97/bookstore/users-api/utils"
 )
 

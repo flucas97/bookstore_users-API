@@ -1,12 +1,11 @@
 package users_db
 
 import (
-	"context"
 	"database/sql"
 	"fmt"
+	"log"
 	"os"
 
-	"github.com/flucas97/go-trainning/exercises/context/log"
 	_ "github.com/go-sql-driver/mysql"
 )
 
@@ -18,6 +17,7 @@ const (
 )
 
 var (
+	// Client is type of pointer to database connection
 	Client   *sql.DB
 	username = os.Getenv(mysql_users_username)
 	password = os.Getenv(mysql_users_password)
@@ -44,6 +44,5 @@ func init() {
 		panic(err)
 	}
 
-	log.Println(context.Background(), "database successfuly conected")
-
+	log.Printf("Database %v successfuly connected", schema)
 }
