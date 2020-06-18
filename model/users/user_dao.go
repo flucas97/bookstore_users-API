@@ -10,12 +10,8 @@ import (
 
 const (
 	queryInsertUser  = ("INSERT INTO users(first_name, last_name, email, created_at) VALUES (?, ?, ?, ?);")
-	queryFindUser    = ("SELECT * FROM users WHERE id=?;")
+	queryFindUser    = ("SELECT id, first_name, last_name, email, created_at FROM users WHERE id=?;")
 	indexUniqueEmail = "email_UNIQUE"
-)
-
-var (
-	usersDB = make(map[int64]*User)
 )
 
 // Save persist user in database
@@ -50,16 +46,17 @@ func (user *User) Find() *utils.RestErr {
 		panic(err)
 	}
 
-	result := usersDB[user.ID]
-	if result == nil {
-		return utils.NewNotFoundError(fmt.Sprintf("User %v not found", user.ID))
+	stmt, err := users_db.Client.Prepare(queryFindUser)
+	if err != nil {
+		return utils.NewInternalServerError(fmt.Sprintln("error while preparing search query"))
 	}
+	defer stmt.Close()
 
-	user.ID = result.ID
-	user.FirstName = result.FirstName
-	user.Email = result.Email
-	user.LastName = result.LastName
-	user.CreatedAt = result.CreatedAt
+	searchResult := stmt.QueryRow(user.ID)
+
+	if err := searchResult.Scan(&user.ID, &user.FirstName, &user.LastName, &user.Email, &user.CreatedAt); err != nil {
+		return utils.NewNotFoundError(fmt.Sprintf("user ID:%v not found", user.ID))
+	}
 
 	return nil
 }

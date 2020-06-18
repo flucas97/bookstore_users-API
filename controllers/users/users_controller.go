@@ -39,8 +39,7 @@ func FindUser(c *gin.Context) {
 
 	user, FindErr := services.FindUser(userID)
 	if FindErr != nil {
-		err := utils.NewNotFoundError("User not found")
-		c.JSON(err.Status, err)
+		c.JSON(FindErr.Status, FindErr)
 		return
 	}
 
