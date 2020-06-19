@@ -104,5 +104,5 @@ func DeleteUser(c *gin.Context) {
 		c.JSON(deleteErr.Status, deleteErr)
 	}
 
-	c.JSON(http.StatusOK, "user successfuly deleted")
+	c.JSON(http.StatusOK, map[string]string{"status": "deleted"})
 }
