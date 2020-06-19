@@ -1,1 +1,1 @@
-### Bookstore Users REST API, with MVC pattern
+### Bookstore Users Restful API, with MVC pattern
