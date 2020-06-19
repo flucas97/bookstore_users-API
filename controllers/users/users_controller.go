@@ -1,7 +1,6 @@
 package users_controller
 
 import (
-	"fmt"
 	"net/http"
 	"strconv"
 
@@ -67,11 +66,10 @@ func UpdateUser(c *gin.Context) {
 		c.JSON(restErr.Status, err.Error())
 		return
 	}
-	fmt.Println(*user)
+
 	// aqui o usuário é de fato atualizado e salvo no banco
 	if err := services.UpdateUser(user); err != nil {
-		restErr := utils.NewBadRequestError("error saving user")
-		c.JSON(restErr.Status, restErr)
+		c.JSON(err.Status, err)
 		return
 	}
 
