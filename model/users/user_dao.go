@@ -125,7 +125,7 @@ func FindByStatus(status string) ([]User, *utils.RestErr) {
 	}
 	defer rows.Close()
 
-	usersResult := make([]User, 1000)
+	usersResult := make([]User, 0)
 
 	for rows.Next() {
 		var user User
@@ -137,7 +137,7 @@ func FindByStatus(status string) ([]User, *utils.RestErr) {
 	}
 
 	if len(usersResult) == 0 {
-		return nil, utils.NewNotFoundError("no active users found")
+		return nil, utils.NewNotFoundError(fmt.Sprintf("no users with status '%v' found", status))
 	}
 
 	return usersResult, nil
