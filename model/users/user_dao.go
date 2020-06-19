@@ -9,7 +9,7 @@ import (
 )
 
 const (
-	queryUpdateUser = ("UPDATE users SET (first_name=?, last_name=?, email=?) WHERE id=?;")
+	queryUpdateUser = ("UPDATE users SET first_name=?, last_name=?, email=? WHERE id=?;")
 	queryInsertUser = ("INSERT INTO users(first_name, last_name, email, created_at) VALUES (?, ?, ?, ?);")
 	queryFindUser   = ("SELECT id, first_name, last_name, email, created_at FROM users WHERE id=?;")
 )
@@ -70,12 +70,12 @@ func (user *User) Update() *utils.RestErr {
 		return utils.NewInternalServerError(fmt.Sprintln("error while preparing search query"))
 	}
 	defer stmt.Close()
+
 	// executa
-	insertResult, err := stmt.Exec(user.FirstName, user.LastName, user.Email, user.ID)
+	_, err = stmt.Exec(user.FirstName, user.LastName, user.Email, user.ID)
 	if err != nil {
 		return utils.ParseError(err)
 	}
 
-	user.ID, err = insertResult.LastInsertId()
 	return nil
 }

@@ -1,7 +1,7 @@
 package users_controller
 
 import (
-	"log"
+	"fmt"
 	"net/http"
 	"strconv"
 
@@ -61,20 +61,20 @@ func UpdateUser(c *gin.Context) {
 		c.JSON(FindErr.Status, FindErr)
 		return
 	}
-	log.Print(">>>>>>>>>>>>>>>>")
 	// nesse user eu tenho que inserir o body do payload no user
-	if err := c.ShouldBindJSON(user); err != nil {
+	if err := c.ShouldBindJSON(&user); err != nil {
 		restErr := utils.NewBadRequestError("Invalid JSON body")
 		c.JSON(restErr.Status, err.Error())
 		return
 	}
-
+	fmt.Println(*user)
 	// aqui o usuário é de fato atualizado e salvo no banco
 	if err := services.UpdateUser(user); err != nil {
-		restErr := utils.NewBadRequestError("Invalid JSON body")
+		restErr := utils.NewBadRequestError("error saving user")
 		c.JSON(restErr.Status, restErr)
 		return
 	}
+
 	// retornamos status ok e o user foi atualizado
 	c.JSON(http.StatusOK, user)
 }
