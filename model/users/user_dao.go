@@ -89,7 +89,6 @@ func (user *User) Update() *utils.RestErr {
 
 // Delete destroy a user
 func (user *User) Delete() *utils.RestErr {
-	// check if is everything OK accessing the DB
 	if err := users_db.Client.Ping(); err != nil {
 		panic(err)
 	}
@@ -110,7 +109,6 @@ func (user *User) Delete() *utils.RestErr {
 
 // FindByStatus get all active users
 func FindByStatus(status string) ([]User, *utils.RestErr) {
-	// check if is everything OK accessing the DB
 	if err := users_db.Client.Ping(); err != nil {
 		panic(err)
 	}
@@ -127,15 +125,20 @@ func FindByStatus(status string) ([]User, *utils.RestErr) {
 	}
 	defer rows.Close()
 
-	result := make([]User, 0)
+	usersResult := make([]User, 1000)
+
 	for rows.Next() {
 		var user User
 		err := rows.Scan(&user.ID, &user.FirstName, &user.LastName, &user.Email, &user.CreatedAt, &user.UpdatedAt, &user.Status)
 		if err != nil {
 			return nil, utils.ParseError(err)
 		}
-		result = append(result, user)
+		usersResult = append(usersResult, user)
 	}
 
-	return result, nil
+	if len(usersResult) == 0 {
+		return nil, utils.NewNotFoundError("no active users found")
+	}
+
+	return usersResult, nil
 }
