@@ -25,14 +25,18 @@ func FindUser(id int64) (*users.User, *utils.RestErr) {
 	return result, nil
 }
 
-func UpdateUser(user *users.User) *utils.RestErr {
+// UpdateUser patch user
+func UpdateUser(user users.User) (*users.User, *utils.RestErr) {
+	var err *utils.RestErr
+
 	if err := user.Validate(); err != nil {
-		return err
+		return nil, err
 	}
 
-	if err := user.Update(); err != nil {
-		return err
+	err = user.Update()
+	if err != nil {
+		return nil, err
 	}
 
-	return nil
+	return &user, nil
 }
