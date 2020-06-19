@@ -30,8 +30,10 @@ func (user *User) Save() *errors_utils.RestErr {
 
 	user.CreatedAt, user.UpdatedAt, user.Status = dates_utils.GetNowString(), dates_utils.GetNowString(), statusActive
 
-	insertResult, _ := stmt.Exec(user.FirstName, user.LastName, user.Email, user.Password, user.Status, user.CreatedAt, user.UpdatedAt)
-
+	insertResult, err := stmt.Exec(user.FirstName, user.LastName, user.Email, user.Password, user.Status, user.CreatedAt, user.UpdatedAt)
+	if err != nil {
+		return errors_utils.NewInternalServerError(fmt.Sprintf("error searching in database"))
+	}
 	userID, err := insertResult.LastInsertId()
 	if err != nil {
 		return errors_utils.NewInternalServerError(fmt.Sprintf("error when trying to save user: %s", err.Error()))
@@ -67,7 +69,6 @@ func (user *User) Find() *errors_utils.RestErr {
 
 // Update a existent user
 func (user *User) Update() *errors_utils.RestErr {
-	// montar a query
 	stmt, err := users_db.Client.Prepare(queryUpdateUser)
 	if err != nil {
 		return errors_utils.NewInternalServerError(fmt.Sprintln("error while preparing search query"))
@@ -76,7 +77,6 @@ func (user *User) Update() *errors_utils.RestErr {
 
 	user.UpdatedAt = dates_utils.GetNowString()
 
-	// executa
 	_, err = stmt.Exec(&user.FirstName, &user.LastName, &user.Email, &user.Password, &user.CreatedAt, &user.UpdatedAt, &user.ID)
 	if err != nil {
 		return mysql_utils.ParseError(err)
