@@ -56,8 +56,7 @@ func UpdateUser(c *gin.Context) {
 		return
 	}
 
-	userUpdates.ID = userID
-
+	// current user in database
 	current, FindErr := services.FindUser(userID)
 	if FindErr != nil {
 		c.JSON(FindErr.Status, FindErr)
@@ -69,6 +68,7 @@ func UpdateUser(c *gin.Context) {
 		userUpdates = *current
 	}
 
+	// fix created at blank after update
 	userUpdates.CreatedAt = current.CreatedAt
 
 	if err := c.ShouldBindJSON(&userUpdates); err != nil {
@@ -76,6 +76,8 @@ func UpdateUser(c *gin.Context) {
 		c.JSON(restErr.Status, err.Error())
 		return
 	}
+
+	userUpdates.ID = current.ID
 
 	// persist changes
 	result, err := services.UpdateUser(userUpdates)

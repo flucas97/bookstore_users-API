@@ -73,6 +73,7 @@ func (user *User) Update() *utils.RestErr {
 	defer stmt.Close()
 
 	user.UpdatedAt = utils.GetNowString()
+
 	// executa
 	_, err = stmt.Exec(&user.FirstName, &user.LastName, &user.Email, &user.CreatedAt, &user.UpdatedAt, &user.ID)
 	if err != nil {
