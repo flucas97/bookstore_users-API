@@ -45,8 +45,7 @@ func FindUser(c *gin.Context) {
 }
 
 func UpdateUser(c *gin.Context) {
-	// Aqui vai receber uma requisição e montar os dados
-	// o ID do path
+	// receive request, convert ID in int
 	userID, UserErr := strconv.ParseInt(c.Param("user_id"), 10, 64)
 	if UserErr != nil {
 		err := utils.NewBadRequestError("ID should be a number")
@@ -54,25 +53,25 @@ func UpdateUser(c *gin.Context) {
 		return
 	}
 
-	// com esse ID eu pesquiso o user no banco
+	// search user in DB
 	user, FindErr := services.FindUser(userID)
 	if FindErr != nil {
 		c.JSON(FindErr.Status, FindErr)
 		return
 	}
-	// nesse user eu tenho que inserir o body do payload no user
+	// update this pointer to current user with json body
 	if err := c.ShouldBindJSON(&user); err != nil {
 		restErr := utils.NewBadRequestError("Invalid JSON body")
 		c.JSON(restErr.Status, err.Error())
 		return
 	}
 
-	// aqui o usuário é de fato atualizado e salvo no banco
+	// persist changes
 	if err := services.UpdateUser(user); err != nil {
 		c.JSON(err.Status, err)
 		return
 	}
 
-	// retornamos status ok e o user foi atualizado
+	// status ok, user updated
 	c.JSON(http.StatusOK, user)
 }
