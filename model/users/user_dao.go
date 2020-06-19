@@ -108,7 +108,7 @@ func (user *User) Delete() *utils.RestErr {
 }
 
 // FindByStatus get all active users
-func FindByStatus(status string) ([]User, *utils.RestErr) {
+func Search(status string) ([]User, *utils.RestErr) {
 	if err := users_db.Client.Ping(); err != nil {
 		panic(err)
 	}
