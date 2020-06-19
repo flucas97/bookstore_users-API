@@ -13,7 +13,6 @@ import (
 func CreateUser(c *gin.Context) {
 	var user users.User
 
-	// the same way of readall and unmarshall, but shortcut
 	if err := c.ShouldBindJSON(&user); err != nil {
 		restErr := utils.NewBadRequestError("Invalid JSON body")
 		c.JSON(restErr.Status, restErr)
@@ -24,6 +23,7 @@ func CreateUser(c *gin.Context) {
 	if err != nil {
 		c.JSON(err.Status, err)
 	}
+
 	c.JSON(http.StatusCreated, result)
 }
 
