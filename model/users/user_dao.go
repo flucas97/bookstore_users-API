@@ -9,10 +9,13 @@ import (
 )
 
 const (
-	queryUpdateUser = ("UPDATE users SET first_name=?, last_name=?, email=?, created_at=?, updated_at=? WHERE id=?;")
-	queryInsertUser = ("INSERT INTO users(first_name, last_name, email, created_at, updated_at) VALUES (?, ?, ?, ?, ?);")
-	queryFindUser   = ("SELECT id, first_name, last_name, email, created_at, updated_at FROM users WHERE id=?;")
-	queryDeleteUser = ("DELETE FROM users WHERE id=?;")
+	queryUpdateUser        = ("UPDATE users SET first_name=?, last_name=?, email=?, created_at=?, updated_at=? WHERE id=?;")
+	queryInsertUser        = ("INSERT INTO users(first_name, last_name, email, password, status, created_at, updated_at) VALUES (?, ?, ?, ?, ?, ?, ?);")
+	queryFindUser          = ("SELECT id, first_name, last_name, email, status, created_at, updated_at FROM users WHERE id=?;")
+	queryDeleteUser        = ("DELETE FROM users WHERE id=?;")
+	queryFindUsersByStatus = ("SELECT id, first_name, last_name, email, created_at, updated_at, status FROM users WHERE status=?;")
+	statusActive           = "active"
+	statusEnded            = "ended"
 )
 
 // Save persist user in database
@@ -23,9 +26,9 @@ func (user *User) Save() *utils.RestErr {
 	}
 	defer stmt.Close() // Close db connection with this statement
 
-	user.CreatedAt, user.UpdatedAt = utils.GetNowString(), utils.GetNowString()
+	user.CreatedAt, user.UpdatedAt, user.Status = utils.GetNowString(), utils.GetNowString(), statusActive
 
-	insertResult, err := stmt.Exec(user.FirstName, user.LastName, user.Email, user.CreatedAt, user.UpdatedAt)
+	insertResult, err := stmt.Exec(user.FirstName, user.LastName, user.Email, user.Password, user.Status, user.CreatedAt, user.UpdatedAt)
 	if err != nil {
 		return utils.ParseError(err)
 	}
@@ -54,7 +57,7 @@ func (user *User) Find() *utils.RestErr {
 
 	searchResult := stmt.QueryRow(user.ID)
 
-	if err := searchResult.Scan(&user.ID, &user.FirstName, &user.LastName, &user.Email, &user.CreatedAt, &user.UpdatedAt); err != nil {
+	if err := searchResult.Scan(&user.ID, &user.FirstName, &user.LastName, &user.Email, &user.Status, &user.CreatedAt, &user.UpdatedAt); err != nil {
 		if strings.Contains(err.Error(), "no rows in result set") {
 			return utils.NewNotFoundError(fmt.Sprintf("user ID:%v not found", user.ID))
 		}
@@ -103,4 +106,36 @@ func (user *User) Delete() *utils.RestErr {
 	}
 
 	return nil
+}
+
+// FindByStatus get all active users
+func FindByStatus(status string) ([]User, *utils.RestErr) {
+	// check if is everything OK accessing the DB
+	if err := users_db.Client.Ping(); err != nil {
+		panic(err)
+	}
+
+	stmt, err := users_db.Client.Prepare(queryFindUsersByStatus)
+	if err != nil {
+		return nil, utils.NewInternalServerError(fmt.Sprintln("error while preparing search query"))
+	}
+	defer stmt.Close()
+
+	rows, err := stmt.Query(status)
+	if err != nil {
+		return nil, utils.ParseError(err)
+	}
+	defer rows.Close()
+
+	result := make([]User, 0)
+	for rows.Next() {
+		var user User
+		err := rows.Scan(&user.ID, &user.FirstName, &user.LastName, &user.Email, &user.CreatedAt, &user.UpdatedAt, &user.Status)
+		if err != nil {
+			return nil, utils.ParseError(err)
+		}
+		result = append(result, user)
+	}
+
+	return result, nil
 }

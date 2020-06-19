@@ -17,7 +17,7 @@ func ParseError(err error) *RestErr {
 		if strings.Contains(err.Error(), errorNoRows) {
 			return NewNotFoundError("no record matching given id")
 		}
-		return NewInternalServerError(fmt.Sprintf("error parsing database response"))
+		return NewInternalServerError(fmt.Sprintf("error parsing database response %v", err.Error()))
 	}
 
 	switch mysqlErr.Number {
@@ -25,5 +25,5 @@ func ParseError(err error) *RestErr {
 		return NewBadRequestError("email already exists")
 	}
 
-	return NewInternalServerError(fmt.Sprintf("error processing request"))
+	return NewInternalServerError(fmt.Sprintf("error processing request %v", mysqlErr))
 }
