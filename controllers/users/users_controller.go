@@ -55,14 +55,25 @@ func UpdateUser(c *gin.Context) {
 		c.JSON(err.Status, err)
 		return
 	}
+
 	userUpdates.ID = userID
 
-	// update this pointer to current user with json body
+	if c.Request.Method == http.MethodPatch {
+		current, FindErr := services.FindUser(userID)
+		if FindErr != nil {
+			c.JSON(FindErr.Status, FindErr)
+			return
+		}
+		userUpdates = *current
+	}
+
 	if err := c.ShouldBindJSON(&userUpdates); err != nil {
 		restErr := utils.NewBadRequestError("Invalid JSON body")
 		c.JSON(restErr.Status, err.Error())
 		return
 	}
+	// update this pointer to current user with json body
+
 	// persist changes
 	result, err := services.UpdateUser(userUpdates)
 	if err != nil {
