@@ -3,7 +3,6 @@ package users_controller
 import (
 	"fmt"
 	"net/http"
-	"strconv"
 
 	"github.com/flucas97/bookstore/users-api/model/users"
 	"github.com/flucas97/bookstore/users-api/services"
@@ -29,7 +28,7 @@ func CreateUser(c *gin.Context) {
 }
 
 func FindUser(c *gin.Context) {
-	userID, UserErr := strconv.ParseInt(c.Param("user_id"), 10, 64)
+	userID, UserErr := utils.ConvertID(c.Param("user_id"))
 	if UserErr != nil {
 		err := utils.NewBadRequestError("ID should be a number")
 		c.JSON(err.Status, err)
@@ -46,30 +45,26 @@ func FindUser(c *gin.Context) {
 }
 
 func UpdateUser(c *gin.Context) {
-	// receive request, convert ID in int
 	var err *utils.RestErr
 	var userUpdates users.User
 
-	userID, UserErr := strconv.ParseInt(c.Param("user_id"), 10, 64)
+	userID, UserErr := utils.ConvertID(c.Param("user_id"))
 	if UserErr != nil {
 		err = utils.NewBadRequestError("ID should be a number")
 		c.JSON(err.Status, err)
 		return
 	}
 
-	// current user in database
 	current, FindErr := services.FindUser(userID)
 	if FindErr != nil {
 		c.JSON(FindErr.Status, FindErr)
 		return
 	}
 
-	// check if is put or patch
 	if c.Request.Method == http.MethodPatch {
 		userUpdates = *current
 	}
 
-	// fix created at blank after update
 	userUpdates.CreatedAt = current.CreatedAt
 
 	if err := c.ShouldBindJSON(&userUpdates); err != nil {
@@ -80,19 +75,17 @@ func UpdateUser(c *gin.Context) {
 
 	userUpdates.ID = current.ID
 
-	// persist changes
 	result, err := services.UpdateUser(userUpdates)
 	if err != nil {
 		c.JSON(err.Status, err)
 		return
 	}
 
-	// status ok, user updated
 	c.JSON(http.StatusOK, result)
 }
 
 func DeleteUser(c *gin.Context) {
-	userID, UserErr := strconv.ParseInt(c.Param("user_id"), 10, 64)
+	userID, UserErr := utils.ConvertID(c.Param("user_id"))
 	if UserErr != nil {
 		err := utils.NewBadRequestError("ID should be a number")
 		c.JSON(err.Status, err)
