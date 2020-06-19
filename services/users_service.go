@@ -36,3 +36,12 @@ func UpdateUser(user users.User) (*users.User, *utils.RestErr) {
 
 	return &user, nil
 }
+
+// DeleteUser destoy a user
+func DeleteUser(user *users.User) *utils.RestErr {
+	if err := user.Delete(); err != nil {
+		return err
+	}
+
+	return nil
+}

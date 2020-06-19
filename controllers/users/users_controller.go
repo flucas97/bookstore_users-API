@@ -1,6 +1,7 @@
 package users_controller
 
 import (
+	"fmt"
 	"net/http"
 	"strconv"
 
@@ -88,4 +89,27 @@ func UpdateUser(c *gin.Context) {
 
 	// status ok, user updated
 	c.JSON(http.StatusOK, result)
+}
+
+func DeleteUser(c *gin.Context) {
+	userID, UserErr := strconv.ParseInt(c.Param("user_id"), 10, 64)
+	if UserErr != nil {
+		err := utils.NewBadRequestError("ID should be a number")
+		c.JSON(err.Status, err)
+		return
+	}
+
+	user, FindErr := services.FindUser(userID)
+	if FindErr != nil {
+		c.JSON(FindErr.Status, FindErr)
+		return
+	}
+
+	err := services.DeleteUser(user)
+	if err != nil {
+		deleteErr := utils.NewInternalServerError(fmt.Sprintf("error while deleting user %v", user.ID))
+		c.JSON(deleteErr.Status, deleteErr)
+	}
+
+	c.JSON(http.StatusOK, "user successfuly deleted")
 }
