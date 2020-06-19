@@ -64,6 +64,7 @@ func UpdateUser(c *gin.Context) {
 		return
 	}
 
+	// check if is put or patch
 	if c.Request.Method == http.MethodPatch {
 		userUpdates = *current
 	}

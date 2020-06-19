@@ -78,6 +78,6 @@ func (user *User) Update() *utils.RestErr {
 	if err != nil {
 		return utils.ParseError(err)
 	}
-	fmt.Println(">>>>>>>", user)
+
 	return nil
 }
