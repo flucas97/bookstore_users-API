@@ -2,10 +2,10 @@ package services
 
 import (
 	"github.com/flucas97/bookstore/users-api/model/users"
-	"github.com/flucas97/bookstore/users-api/utils"
+	"github.com/flucas97/bookstore/users-api/utils/errors_utils"
 )
 
-func CreateUser(user users.User) (*users.User, *utils.RestErr) {
+func CreateUser(user users.User) (*users.User, *errors_utils.RestErr) {
 	if err := user.Validate(); err != nil {
 		return nil, err
 	}
@@ -16,7 +16,7 @@ func CreateUser(user users.User) (*users.User, *utils.RestErr) {
 	return &user, nil
 }
 
-func FindUser(id int64) (*users.User, *utils.RestErr) {
+func FindUser(id int64) (*users.User, *errors_utils.RestErr) {
 	result := &users.User{ID: id}
 	if err := result.Find(); err != nil {
 		return nil, err
@@ -26,7 +26,7 @@ func FindUser(id int64) (*users.User, *utils.RestErr) {
 }
 
 // UpdateUser patch user
-func UpdateUser(user users.User) (*users.User, *utils.RestErr) {
+func UpdateUser(user users.User) (*users.User, *errors_utils.RestErr) {
 	if err := user.Validate(); err != nil {
 		return nil, err
 	}
@@ -38,7 +38,7 @@ func UpdateUser(user users.User) (*users.User, *utils.RestErr) {
 }
 
 // DeleteUser destoy a user
-func DeleteUser(user *users.User) *utils.RestErr {
+func DeleteUser(user *users.User) *errors_utils.RestErr {
 	if err := user.Delete(); err != nil {
 		return err
 	}
@@ -46,7 +46,7 @@ func DeleteUser(user *users.User) *utils.RestErr {
 	return nil
 }
 
-func Search(s string) ([]users.User, *utils.RestErr) {
+func Search(s string) ([]users.User, *errors_utils.RestErr) {
 	result, err := users.Search(s)
 	if err != nil {
 		return nil, err

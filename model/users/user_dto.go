@@ -3,7 +3,7 @@ package users
 import (
 	"strings"
 
-	"github.com/flucas97/bookstore/users-api/utils"
+	"github.com/flucas97/bookstore/users-api/utils/errors_utils"
 )
 
 type User struct {
@@ -14,14 +14,14 @@ type User struct {
 	CreatedAt string `json:"created_at"`
 	UpdatedAt string `json:"updated_at"`
 	Status    string `json:"status"`
-	Password  string `json:"-"`
+	Password  string `json:"password"`
 }
 
-func (u *User) Validate() *utils.RestErr {
+func (u *User) Validate() *errors_utils.RestErr {
 	u.Email = strings.TrimSpace(strings.ToLower(u.Email))
 
 	if u.Email == "" {
-		return utils.NewBadRequestError("Invalid email address")
+		return errors_utils.NewBadRequestError("Invalid email address")
 	}
 
 	return nil

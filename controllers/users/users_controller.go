@@ -6,7 +6,9 @@ import (
 
 	"github.com/flucas97/bookstore/users-api/model/users"
 	"github.com/flucas97/bookstore/users-api/services"
-	"github.com/flucas97/bookstore/users-api/utils"
+	"github.com/flucas97/bookstore/users-api/utils/convert_utils"
+	"github.com/flucas97/bookstore/users-api/utils/errors_utils"
+
 	"github.com/gin-gonic/gin"
 )
 
@@ -14,7 +16,7 @@ func CreateUser(c *gin.Context) {
 	var user users.User
 
 	if err := c.ShouldBindJSON(&user); err != nil {
-		restErr := utils.NewBadRequestError("Invalid JSON body")
+		restErr := errors_utils.NewBadRequestError("Invalid JSON body")
 		c.JSON(restErr.Status, restErr)
 		return
 	}
@@ -28,9 +30,9 @@ func CreateUser(c *gin.Context) {
 }
 
 func FindUser(c *gin.Context) {
-	userID, UserErr := utils.ConvertID(c.Param("user_id"))
+	userID, UserErr := convert_utils.ConvertID(c.Param("user_id"))
 	if UserErr != nil {
-		err := utils.NewBadRequestError("ID should be a number")
+		err := errors_utils.NewBadRequestError("ID should be a number")
 		c.JSON(err.Status, err)
 		return
 	}
@@ -45,12 +47,12 @@ func FindUser(c *gin.Context) {
 }
 
 func UpdateUser(c *gin.Context) {
-	var err *utils.RestErr
+	var err *errors_utils.RestErr
 	var userUpdates users.User
 
-	userID, UserErr := utils.ConvertID(c.Param("user_id"))
+	userID, UserErr := convert_utils.ConvertID(c.Param("user_id"))
 	if UserErr != nil {
-		err = utils.NewBadRequestError("ID should be a number")
+		err = errors_utils.NewBadRequestError("ID should be a number")
 		c.JSON(err.Status, err)
 		return
 	}
@@ -68,7 +70,7 @@ func UpdateUser(c *gin.Context) {
 	userUpdates.CreatedAt = current.CreatedAt
 
 	if err := c.ShouldBindJSON(&userUpdates); err != nil {
-		restErr := utils.NewBadRequestError("Invalid JSON body")
+		restErr := errors_utils.NewBadRequestError("Invalid JSON body")
 		c.JSON(restErr.Status, err.Error())
 		return
 	}
@@ -85,9 +87,9 @@ func UpdateUser(c *gin.Context) {
 }
 
 func DeleteUser(c *gin.Context) {
-	userID, UserErr := utils.ConvertID(c.Param("user_id"))
+	userID, UserErr := convert_utils.ConvertID(c.Param("user_id"))
 	if UserErr != nil {
-		err := utils.NewBadRequestError("ID should be a number")
+		err := errors_utils.NewBadRequestError("ID should be a number")
 		c.JSON(err.Status, err)
 		return
 	}
@@ -100,7 +102,7 @@ func DeleteUser(c *gin.Context) {
 
 	err := services.DeleteUser(user)
 	if err != nil {
-		deleteErr := utils.NewInternalServerError(fmt.Sprintf("error while deleting user %v", user.ID))
+		deleteErr := errors_utils.NewInternalServerError(fmt.Sprintf("error while deleting user %v", user.ID))
 		c.JSON(deleteErr.Status, deleteErr)
 	}
 

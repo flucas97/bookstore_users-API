@@ -1,4 +1,4 @@
-package utils
+package errors_utils
 
 import "net/http"
 
