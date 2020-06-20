@@ -5,6 +5,7 @@ import (
 	"strings"
 
 	"github.com/flucas97/bookstore/users-api/datasources/mysql/users_db"
+	"github.com/flucas97/bookstore/users-api/utils/crypto_utils"
 	"github.com/flucas97/bookstore/users-api/utils/dates_utils"
 	"github.com/flucas97/bookstore/users-api/utils/errors_utils"
 	"github.com/flucas97/bookstore/users-api/utils/mysql_utils"
@@ -29,6 +30,7 @@ func (user *User) Save() *errors_utils.RestErr {
 	defer stmt.Close() // Close db connection with this statement
 
 	user.CreatedAt, user.UpdatedAt, user.Status = dates_utils.GetNowString(), dates_utils.GetNowString(), statusActive
+	user.Password = crypto_utils.GetMd5(user.Password)
 
 	insertResult, err := stmt.Exec(user.FirstName, user.LastName, user.Email, user.Password, user.Status, user.CreatedAt, user.UpdatedAt)
 	if err != nil {
