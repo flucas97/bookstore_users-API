@@ -12,6 +12,10 @@ import (
 	"github.com/gin-gonic/gin"
 )
 
+var (
+	userService = services.UserService{}
+)
+
 func CreateUser(c *gin.Context) {
 	var user users.User
 
@@ -21,7 +25,7 @@ func CreateUser(c *gin.Context) {
 		return
 	}
 
-	result, err := services.CreateUser(user)
+	result, err := userService.CreateUser(user)
 	if err != nil {
 		c.JSON(err.Status, err)
 	}
@@ -37,7 +41,7 @@ func FindUser(c *gin.Context) {
 		return
 	}
 
-	user, FindErr := services.FindUser(userID)
+	user, FindErr := userService.FindUser(userID)
 	if FindErr != nil {
 		c.JSON(FindErr.Status, FindErr)
 		return
@@ -57,7 +61,7 @@ func UpdateUser(c *gin.Context) {
 		return
 	}
 
-	current, FindErr := services.FindUser(userID)
+	current, FindErr := userService.FindUser(userID)
 	if FindErr != nil {
 		c.JSON(FindErr.Status, FindErr)
 		return
@@ -77,7 +81,7 @@ func UpdateUser(c *gin.Context) {
 
 	userUpdates.ID = current.ID
 
-	result, err := services.UpdateUser(userUpdates)
+	result, err := userService.UpdateUser(userUpdates)
 	if err != nil {
 		c.JSON(err.Status, err)
 		return
@@ -94,13 +98,13 @@ func DeleteUser(c *gin.Context) {
 		return
 	}
 
-	user, FindErr := services.FindUser(userID)
+	user, FindErr := userService.FindUser(userID)
 	if FindErr != nil {
 		c.JSON(FindErr.Status, FindErr)
 		return
 	}
 
-	err := services.DeleteUser(user)
+	err := userService.DeleteUser(user)
 	if err != nil {
 		deleteErr := errors_utils.NewInternalServerError(fmt.Sprintf("error while deleting user %v", user.ID))
 		c.JSON(deleteErr.Status, deleteErr)
@@ -112,7 +116,7 @@ func DeleteUser(c *gin.Context) {
 func Search(c *gin.Context) {
 	status := c.Query("status")
 
-	users, FindErr := services.Search(status)
+	users, FindErr := userService.Search(status)
 	if FindErr != nil {
 		c.JSON(FindErr.Status, FindErr)
 		return

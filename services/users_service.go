@@ -5,7 +5,9 @@ import (
 	"github.com/flucas97/bookstore/users-api/utils/errors_utils"
 )
 
-func CreateUser(user users.User) (*users.User, *errors_utils.RestErr) {
+type UserService struct{}
+
+func (service *UserService) CreateUser(user users.User) (*users.User, *errors_utils.RestErr) {
 	if err := user.Validate(); err != nil {
 		return nil, err
 	}
@@ -16,7 +18,7 @@ func CreateUser(user users.User) (*users.User, *errors_utils.RestErr) {
 	return &user, nil
 }
 
-func FindUser(id int64) (*users.User, *errors_utils.RestErr) {
+func (service *UserService) FindUser(id int64) (*users.User, *errors_utils.RestErr) {
 	result := &users.User{ID: id}
 	if err := result.Find(); err != nil {
 		return nil, err
@@ -26,7 +28,7 @@ func FindUser(id int64) (*users.User, *errors_utils.RestErr) {
 }
 
 // UpdateUser patch user
-func UpdateUser(user users.User) (*users.User, *errors_utils.RestErr) {
+func (service *UserService) UpdateUser(user users.User) (*users.User, *errors_utils.RestErr) {
 	if err := user.Validate(); err != nil {
 		return nil, err
 	}
@@ -38,7 +40,7 @@ func UpdateUser(user users.User) (*users.User, *errors_utils.RestErr) {
 }
 
 // DeleteUser destoy a user
-func DeleteUser(user *users.User) *errors_utils.RestErr {
+func (service *UserService) DeleteUser(user *users.User) *errors_utils.RestErr {
 	if err := user.Delete(); err != nil {
 		return err
 	}
@@ -46,7 +48,7 @@ func DeleteUser(user *users.User) *errors_utils.RestErr {
 	return nil
 }
 
-func Search(s string) (users.Users, *errors_utils.RestErr) {
+func (service UserService) Search(s string) (users.Users, *errors_utils.RestErr) {
 	result, err := users.Search(s)
 	if err != nil {
 		return nil, err
