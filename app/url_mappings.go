@@ -10,13 +10,13 @@ func MapURL() {
 	router.GET("/ping", ping_controller.Ping)
 
 	// users routes
-	router.GET("/user/:user_id", users_controller.FindUser)
+	router.GET("/user/:user_id", users_controller.Find)
 	router.GET("/internal/users/search", users_controller.Search)
 
-	router.POST("/users", users_controller.CreateUser)
+	router.POST("/users", users_controller.Create)
 
-	router.PATCH("/user/:user_id", users_controller.UpdateUser)
-	router.PUT("/user/:user_id", users_controller.UpdateUser)
+	router.PATCH("/user/:user_id", users_controller.Update)
+	router.PUT("/user/:user_id", users_controller.Update)
 
-	router.DELETE("/user/:user_id", users_controller.DeleteUser)
+	router.DELETE("/user/:user_id", users_controller.Delete)
 }

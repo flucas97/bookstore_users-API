@@ -7,7 +7,7 @@ import (
 
 type UserService struct{}
 
-func (service *UserService) CreateUser(user users.User) (*users.User, *errors_utils.RestErr) {
+func (service *UserService) Create(user users.User) (*users.User, *errors_utils.RestErr) {
 	if err := user.Validate(); err != nil {
 		return nil, err
 	}
@@ -18,7 +18,7 @@ func (service *UserService) CreateUser(user users.User) (*users.User, *errors_ut
 	return &user, nil
 }
 
-func (service *UserService) FindUser(id int64) (*users.User, *errors_utils.RestErr) {
+func (service *UserService) Find(id int64) (*users.User, *errors_utils.RestErr) {
 	result := &users.User{ID: id}
 	if err := result.Find(); err != nil {
 		return nil, err
@@ -28,7 +28,7 @@ func (service *UserService) FindUser(id int64) (*users.User, *errors_utils.RestE
 }
 
 // UpdateUser patch user
-func (service *UserService) UpdateUser(user users.User) (*users.User, *errors_utils.RestErr) {
+func (service *UserService) Update(user users.User) (*users.User, *errors_utils.RestErr) {
 	if err := user.Validate(); err != nil {
 		return nil, err
 	}
@@ -40,7 +40,7 @@ func (service *UserService) UpdateUser(user users.User) (*users.User, *errors_ut
 }
 
 // DeleteUser destoy a user
-func (service *UserService) DeleteUser(user *users.User) *errors_utils.RestErr {
+func (service *UserService) Delete(user *users.User) *errors_utils.RestErr {
 	if err := user.Delete(); err != nil {
 		return err
 	}

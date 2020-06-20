@@ -16,7 +16,7 @@ var (
 	userService = services.UserService{}
 )
 
-func CreateUser(c *gin.Context) {
+func Create(c *gin.Context) {
 	var user users.User
 
 	if err := c.ShouldBindJSON(&user); err != nil {
@@ -25,7 +25,7 @@ func CreateUser(c *gin.Context) {
 		return
 	}
 
-	result, err := userService.CreateUser(user)
+	result, err := userService.Create(user)
 	if err != nil {
 		c.JSON(err.Status, err)
 	}
@@ -33,7 +33,7 @@ func CreateUser(c *gin.Context) {
 	c.JSON(http.StatusCreated, result)
 }
 
-func FindUser(c *gin.Context) {
+func Find(c *gin.Context) {
 	userID, UserErr := convert_utils.ConvertID(c.Param("user_id"))
 	if UserErr != nil {
 		err := errors_utils.NewBadRequestError("ID should be a number")
@@ -41,7 +41,7 @@ func FindUser(c *gin.Context) {
 		return
 	}
 
-	user, FindErr := userService.FindUser(userID)
+	user, FindErr := userService.Find(userID)
 	if FindErr != nil {
 		c.JSON(FindErr.Status, FindErr)
 		return
@@ -50,7 +50,7 @@ func FindUser(c *gin.Context) {
 	c.JSON(http.StatusOK, user.Marshall(c.GetHeader("X-Public") == "true"))
 }
 
-func UpdateUser(c *gin.Context) {
+func Update(c *gin.Context) {
 	var err *errors_utils.RestErr
 	var userUpdates users.User
 
@@ -61,7 +61,7 @@ func UpdateUser(c *gin.Context) {
 		return
 	}
 
-	current, FindErr := userService.FindUser(userID)
+	current, FindErr := userService.Find(userID)
 	if FindErr != nil {
 		c.JSON(FindErr.Status, FindErr)
 		return
@@ -81,7 +81,7 @@ func UpdateUser(c *gin.Context) {
 
 	userUpdates.ID = current.ID
 
-	result, err := userService.UpdateUser(userUpdates)
+	result, err := userService.Update(userUpdates)
 	if err != nil {
 		c.JSON(err.Status, err)
 		return
@@ -90,7 +90,7 @@ func UpdateUser(c *gin.Context) {
 	c.JSON(http.StatusOK, result)
 }
 
-func DeleteUser(c *gin.Context) {
+func Delete(c *gin.Context) {
 	userID, UserErr := convert_utils.ConvertID(c.Param("user_id"))
 	if UserErr != nil {
 		err := errors_utils.NewBadRequestError("ID should be a number")
@@ -98,13 +98,13 @@ func DeleteUser(c *gin.Context) {
 		return
 	}
 
-	user, FindErr := userService.FindUser(userID)
+	user, FindErr := userService.Find(userID)
 	if FindErr != nil {
 		c.JSON(FindErr.Status, FindErr)
 		return
 	}
 
-	err := userService.DeleteUser(user)
+	err := userService.Delete(user)
 	if err != nil {
 		deleteErr := errors_utils.NewInternalServerError(fmt.Sprintf("error while deleting user %v", user.ID))
 		c.JSON(deleteErr.Status, deleteErr)
