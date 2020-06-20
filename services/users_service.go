@@ -46,7 +46,7 @@ func DeleteUser(user *users.User) *errors_utils.RestErr {
 	return nil
 }
 
-func Search(s string) ([]users.User, *errors_utils.RestErr) {
+func Search(s string) (users.Users, *errors_utils.RestErr) {
 	result, err := users.Search(s)
 	if err != nil {
 		return nil, err

@@ -6,6 +6,7 @@ import (
 	"github.com/flucas97/bookstore/users-api/utils/errors_utils"
 )
 
+type Users []User
 type User struct {
 	ID        int64  `json:"id"`
 	FirstName string `json:"first_name"`
