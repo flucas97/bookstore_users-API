@@ -5,9 +5,21 @@ import (
 	"github.com/flucas97/bookstore/users-api/utils/errors_utils"
 )
 
-type UserService struct{}
+var (
+	UsersService UsersServiceInterface = &usersService{}
+)
 
-func (service *UserService) Create(user users.User) (*users.User, *errors_utils.RestErr) {
+type usersService struct{}
+
+type UsersServiceInterface interface {
+	Create(users.User) (*users.User, *errors_utils.RestErr)
+	Find(int64) (*users.User, *errors_utils.RestErr)
+	Update(users.User) (*users.User, *errors_utils.RestErr)
+	Delete(*users.User) *errors_utils.RestErr
+	Search(string) (users.Users, *errors_utils.RestErr)
+}
+
+func (service *usersService) Create(user users.User) (*users.User, *errors_utils.RestErr) {
 	if err := user.Validate(); err != nil {
 		return nil, err
 	}
@@ -18,7 +30,7 @@ func (service *UserService) Create(user users.User) (*users.User, *errors_utils.
 	return &user, nil
 }
 
-func (service *UserService) Find(id int64) (*users.User, *errors_utils.RestErr) {
+func (service *usersService) Find(id int64) (*users.User, *errors_utils.RestErr) {
 	result := &users.User{ID: id}
 	if err := result.Find(); err != nil {
 		return nil, err
@@ -28,7 +40,7 @@ func (service *UserService) Find(id int64) (*users.User, *errors_utils.RestErr) 
 }
 
 // UpdateUser patch user
-func (service *UserService) Update(user users.User) (*users.User, *errors_utils.RestErr) {
+func (service *usersService) Update(user users.User) (*users.User, *errors_utils.RestErr) {
 	if err := user.Validate(); err != nil {
 		return nil, err
 	}
@@ -40,7 +52,7 @@ func (service *UserService) Update(user users.User) (*users.User, *errors_utils.
 }
 
 // DeleteUser destoy a user
-func (service *UserService) Delete(user *users.User) *errors_utils.RestErr {
+func (service *usersService) Delete(user *users.User) *errors_utils.RestErr {
 	if err := user.Delete(); err != nil {
 		return err
 	}
@@ -48,7 +60,7 @@ func (service *UserService) Delete(user *users.User) *errors_utils.RestErr {
 	return nil
 }
 
-func (service UserService) Search(s string) (users.Users, *errors_utils.RestErr) {
+func (service usersService) Search(s string) (users.Users, *errors_utils.RestErr) {
 	result, err := users.Search(s)
 	if err != nil {
 		return nil, err

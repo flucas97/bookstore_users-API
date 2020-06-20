@@ -13,7 +13,7 @@ import (
 )
 
 var (
-	userService = services.UserService{}
+	usersService = services.UsersService
 )
 
 func Create(c *gin.Context) {
@@ -25,7 +25,7 @@ func Create(c *gin.Context) {
 		return
 	}
 
-	result, err := userService.Create(user)
+	result, err := usersService.Create(user)
 	if err != nil {
 		c.JSON(err.Status, err)
 	}
@@ -41,7 +41,7 @@ func Find(c *gin.Context) {
 		return
 	}
 
-	user, FindErr := userService.Find(userID)
+	user, FindErr := usersService.Find(userID)
 	if FindErr != nil {
 		c.JSON(FindErr.Status, FindErr)
 		return
@@ -61,7 +61,7 @@ func Update(c *gin.Context) {
 		return
 	}
 
-	current, FindErr := userService.Find(userID)
+	current, FindErr := usersService.Find(userID)
 	if FindErr != nil {
 		c.JSON(FindErr.Status, FindErr)
 		return
@@ -81,7 +81,7 @@ func Update(c *gin.Context) {
 
 	userUpdates.ID = current.ID
 
-	result, err := userService.Update(userUpdates)
+	result, err := usersService.Update(userUpdates)
 	if err != nil {
 		c.JSON(err.Status, err)
 		return
@@ -98,13 +98,13 @@ func Delete(c *gin.Context) {
 		return
 	}
 
-	user, FindErr := userService.Find(userID)
+	user, FindErr := usersService.Find(userID)
 	if FindErr != nil {
 		c.JSON(FindErr.Status, FindErr)
 		return
 	}
 
-	err := userService.Delete(user)
+	err := usersService.Delete(user)
 	if err != nil {
 		deleteErr := errors_utils.NewInternalServerError(fmt.Sprintf("error while deleting user %v", user.ID))
 		c.JSON(deleteErr.Status, deleteErr)
@@ -116,7 +116,7 @@ func Delete(c *gin.Context) {
 func Search(c *gin.Context) {
 	status := c.Query("status")
 
-	users, FindErr := userService.Search(status)
+	users, FindErr := usersService.Search(status)
 	if FindErr != nil {
 		c.JSON(FindErr.Status, FindErr)
 		return
