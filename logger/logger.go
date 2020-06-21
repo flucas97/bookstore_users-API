@@ -6,10 +6,21 @@ import (
 )
 
 var (
-	Log *zap.Logger
+	log    *zap.Logger
+	Logger loggerInterface = &logger{}
 )
 
+type loggerInterface interface {
+	Info()
+}
+
+type logger struct{}
+
 func init() {
+	Logger.Info()
+}
+
+func (l *logger) Info() {
 	logConfig := zap.Config{
 		OutputPaths: []string{"stdout"},
 		Level:       zap.NewAtomicLevelAt(zap.InfoLevel),
@@ -25,8 +36,7 @@ func init() {
 	}
 
 	var err error
-	if Log, err = logConfig.Build(); err != nil {
+	if log, err = logConfig.Build(); err != nil {
 		panic(err)
 	}
-
 }
