@@ -1,6 +1,9 @@
 package app
 
-import "github.com/gin-gonic/gin"
+import (
+	"github.com/flucas97/bookstore/users-api/logger"
+	"github.com/gin-gonic/gin"
+)
 
 var (
 	router = gin.Default()
@@ -8,5 +11,7 @@ var (
 
 func StartApplication() {
 	MapURL()
+
+	logger.Log.Info("starting application...")
 	router.Run(":8080")
 }
