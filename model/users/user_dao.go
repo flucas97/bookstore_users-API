@@ -26,7 +26,8 @@ const (
 func (user *User) Save() *errors_utils.RestErr {
 	stmt, err := users_db.Client.Prepare(queryInsertUser)
 	if err != nil {
-		return errors_utils.NewInternalServerError(fmt.Sprintf("Error: %v", err))
+		logger.Error("error while preparing Save query", err)
+		return errors_utils.NewInternalServerError("an error occurred while saving user. Try again")
 	}
 	defer stmt.Close() // Close db connection with this statement
 
@@ -35,10 +36,12 @@ func (user *User) Save() *errors_utils.RestErr {
 
 	insertResult, err := stmt.Exec(user.FirstName, user.LastName, user.Email, user.Password, user.Status, user.CreatedAt, user.UpdatedAt)
 	if err != nil {
-		return errors_utils.NewInternalServerError(fmt.Sprintf("error searching in database"))
+		logger.Error("error while getting user info from database", err)
+		return errors_utils.NewInternalServerError("an error occurred while searching user. Try again")
 	}
 	userID, err := insertResult.LastInsertId()
 	if err != nil {
+		logger.Error("error while saving user in database query", err)
 		return errors_utils.NewInternalServerError(fmt.Sprintf("error when trying to save user: %s", err.Error()))
 	}
 
@@ -66,7 +69,8 @@ func (user *User) Find() *errors_utils.RestErr {
 		if strings.Contains(err.Error(), "no rows in result set") {
 			return errors_utils.NewNotFoundError(fmt.Sprintf("user ID:%v not found", user.ID))
 		}
-		return errors_utils.NewInternalServerError(fmt.Sprintf("error trying to get user %v error: %s", user.ID, err.Error()))
+		logger.Error("error trying to find user in database", err)
+		return errors_utils.NewInternalServerError(fmt.Sprintf("error trying to get user %v", user.ID))
 	}
 	return nil
 }
