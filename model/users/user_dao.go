@@ -5,6 +5,7 @@ import (
 	"strings"
 
 	"github.com/flucas97/bookstore/users-api/datasources/mysql/users_db"
+	"github.com/flucas97/bookstore/users-api/logger"
 	"github.com/flucas97/bookstore/users-api/utils/crypto_utils"
 	"github.com/flucas97/bookstore/users-api/utils/dates_utils"
 	"github.com/flucas97/bookstore/users-api/utils/errors_utils"
@@ -14,7 +15,7 @@ import (
 const (
 	queryUpdateUser        = ("UPDATE users SET first_name=?, last_name=?, email=?, password=?, created_at=?, updated_at=? WHERE id=?;")
 	queryInsertUser        = ("INSERT INTO users(first_name, last_name, email, password, status, created_at, updated_at) VALUES (?, ?, ?, ?, ?, ?, ?);")
-	queryFindUser          = ("SELECT id, first_name, last_name, email, status, created_at, updated_at FROM users WHERE id=?;")
+	queryFindUser          = (" id, first_name, last_name, email, status, created_at, updated_at FROM users WHERE id=?;")
 	queryDeleteUser        = ("DELETE FROM users WHERE id=?;")
 	queryFindUsersByStatus = ("SELECT id, first_name, last_name, email, created_at, updated_at, status FROM users WHERE status=?;")
 	statusActive           = "active"
@@ -54,7 +55,8 @@ func (user *User) Find() *errors_utils.RestErr {
 
 	stmt, err := users_db.Client.Prepare(queryFindUser)
 	if err != nil {
-		return errors_utils.NewInternalServerError(fmt.Sprintln("error while preparing search query"))
+		logger.Error("error while preparing Find query", err)
+		return errors_utils.NewInternalServerError("an error occurred while finding user. Try again")
 	}
 	defer stmt.Close()
 
@@ -73,7 +75,8 @@ func (user *User) Find() *errors_utils.RestErr {
 func (user *User) Update() *errors_utils.RestErr {
 	stmt, err := users_db.Client.Prepare(queryUpdateUser)
 	if err != nil {
-		return errors_utils.NewInternalServerError(fmt.Sprintln("error while preparing search query"))
+		logger.Error("error while preparing search query", err)
+		return errors_utils.NewInternalServerError("an error occurred while updating user. Try again")
 	}
 	defer stmt.Close()
 
@@ -95,7 +98,8 @@ func (user *User) Delete() *errors_utils.RestErr {
 
 	stmt, err := users_db.Client.Prepare(queryDeleteUser)
 	if err != nil {
-		return errors_utils.NewInternalServerError(fmt.Sprintln("error while preparing search query"))
+		logger.Error("error while preparing Delete query", err)
+		return errors_utils.NewInternalServerError("an error occurred while deleting user. Try again")
 	}
 	defer stmt.Close()
 
@@ -115,7 +119,8 @@ func Search(status string) ([]User, *errors_utils.RestErr) {
 
 	stmt, err := users_db.Client.Prepare(queryFindUsersByStatus)
 	if err != nil {
-		return nil, errors_utils.NewInternalServerError(fmt.Sprintln("error while preparing search query"))
+		logger.Error("error while preparing Search query", err)
+		return nil, errors_utils.NewInternalServerError("an error occurred while searching users. Try again")
 	}
 	defer stmt.Close()
 
