@@ -6,21 +6,12 @@ import (
 )
 
 var (
-	log    *zap.Logger
-	Logger loggerInterface = &logger{}
+	Log *zap.Logger
 )
-
-type loggerInterface interface {
-	Info()
-}
 
 type logger struct{}
 
 func init() {
-	Logger.Info()
-}
-
-func (l *logger) Info() {
 	logConfig := zap.Config{
 		OutputPaths: []string{"stdout"},
 		Level:       zap.NewAtomicLevelAt(zap.InfoLevel),
@@ -36,7 +27,17 @@ func (l *logger) Info() {
 	}
 
 	var err error
-	if log, err = logConfig.Build(); err != nil {
+	if Log, err = logConfig.Build(); err != nil {
 		panic(err)
 	}
+}
+
+func Info(msg string, tags ...zap.Field) {
+	Log.Info(msg, tags...)
+	Log.Sync()
+}
+
+func Error(msg string, tags ...zap.Field) {
+	Log.Error(msg, tags...)
+	Log.Sync()
 }

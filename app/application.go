@@ -7,12 +7,11 @@ import (
 
 var (
 	router = gin.Default()
-	log    = logger.Logger
 )
 
 func StartApplication() {
 	MapURL()
 
-	log.Info("starting application...")
+	logger.Info("starting application...")
 	router.Run(":8080")
 }
