@@ -17,6 +17,7 @@ type UsersServiceInterface interface {
 	Update(users.User) (*users.User, *errors_utils.RestErr)
 	Delete(*users.User) *errors_utils.RestErr
 	Search(string) (users.Users, *errors_utils.RestErr)
+	LoginUser() (*users.User, *errors_utils.RestErr)
 }
 
 func (service *usersService) Create(user users.User) (*users.User, *errors_utils.RestErr) {
@@ -67,4 +68,8 @@ func (service usersService) Search(s string) (users.Users, *errors_utils.RestErr
 	}
 
 	return result, nil
+}
+
+func (service usersService) LoginUser() (*users.User, *errors_utils.RestErr) {
+	return nil, nil
 }
