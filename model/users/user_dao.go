@@ -171,7 +171,7 @@ func (user *User) FindUserByEmailAndPassword() *errors_utils.RestErr {
 
 	if err := searchResult.Scan(&user.ID, &user.FirstName, &user.LastName, &user.Email, &user.Status, &user.CreatedAt, &user.UpdatedAt); err != nil {
 		if strings.Contains(err.Error(), "no rows in result set") {
-			return errors_utils.NewNotFoundError(fmt.Sprintf("user ID:%v not found", user.ID))
+			return errors_utils.NewNotFoundError("invalid email address or password")
 		}
 		logger.Error("error trying to get user by email and password %v", err)
 		return errors_utils.NewInternalServerError("database error")
