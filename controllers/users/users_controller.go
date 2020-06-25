@@ -16,6 +16,24 @@ var (
 	usersService = services.UsersService
 )
 
+func Login(c *gin.Context) {
+	var credentials users.LoginRequest
+
+	if err := c.ShouldBindJSON(&credentials); err != nil {
+		restErr := errors_utils.NewBadRequestError("invalid JSON body")
+		c.JSON(restErr.Status, restErr)
+		return
+	}
+
+	user, err := usersService.LoginUser(credentials)
+	if err != nil {
+		c.JSON(err.Status, err)
+		return
+	}
+
+	c.JSON(http.StatusOK, user)
+}
+
 func Create(c *gin.Context) {
 	var user users.User
 
