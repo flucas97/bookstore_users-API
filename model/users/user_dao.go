@@ -13,13 +13,14 @@ import (
 )
 
 const (
-	queryUpdateUser        = ("UPDATE users SET first_name=?, last_name=?, email=?, password=?, created_at=?, updated_at=? WHERE id=?;")
-	queryInsertUser        = ("INSERT INTO users(first_name, last_name, email, password, status, created_at, updated_at) VALUES (?, ?, ?, ?, ?, ?, ?);")
-	queryFindUser          = (" id, first_name, last_name, email, status, created_at, updated_at FROM users WHERE id=?;")
-	queryDeleteUser        = ("DELETE FROM users WHERE id=?;")
-	queryFindUsersByStatus = ("SELECT id, first_name, last_name, email, created_at, updated_at, status FROM users WHERE status=?;")
-	statusActive           = "active"
-	statusEnded            = "ended"
+	queryUpdateUser             = ("UPDATE users SET first_name=?, last_name=?, email=?, password=?, created_at=?, updated_at=? WHERE id=?;")
+	queryInsertUser             = ("INSERT INTO users(first_name, last_name, email, password, status, created_at, updated_at) VALUES (?, ?, ?, ?, ?, ?, ?);")
+	queryFindUser               = (" id, first_name, last_name, email, status, created_at, updated_at FROM users WHERE id=?;")
+	queryDeleteUser             = ("DELETE FROM users WHERE id=?;")
+	queryFindByStatus           = ("SELECT id, first_name, last_name, email, created_at, updated_at, status FROM users WHERE status=?;")
+	queryFindByEmailAndPassword = ("SELECT id, first_name, last_name, email, created_at, updated_at, status FROM users WHERE email=? AND password=?;")
+	statusActive                = "active"
+	statusEnded                 = "ended"
 )
 
 // Save persist user in database
@@ -121,7 +122,7 @@ func Search(status string) ([]User, *errors_utils.RestErr) {
 		panic(err)
 	}
 
-	stmt, err := users_db.Client.Prepare(queryFindUsersByStatus)
+	stmt, err := users_db.Client.Prepare(queryFindByStatus)
 	if err != nil {
 		logger.Error("error while preparing Search query", err)
 		return nil, errors_utils.NewInternalServerError("an error occurred while searching users. Try again")
@@ -150,4 +151,30 @@ func Search(status string) ([]User, *errors_utils.RestErr) {
 	}
 
 	return usersResult, nil
+}
+
+// Find gets a user
+func (user *User) FindUserByEmailAndPassword() *errors_utils.RestErr {
+	// check if is everything OK accessing the DB
+	if err := users_db.Client.Ping(); err != nil {
+		panic(err)
+	}
+
+	stmt, err := users_db.Client.Prepare(queryFindByEmailAndPassword)
+	if err != nil {
+		logger.Error("error while preparing Find by Email and Password query", err)
+		return errors_utils.NewInternalServerError("database error")
+	}
+	defer stmt.Close()
+
+	searchResult := stmt.QueryRow(user.Email, user.Password)
+
+	if err := searchResult.Scan(&user.ID, &user.FirstName, &user.LastName, &user.Email, &user.Status, &user.CreatedAt, &user.UpdatedAt); err != nil {
+		if strings.Contains(err.Error(), "no rows in result set") {
+			return errors_utils.NewNotFoundError(fmt.Sprintf("user ID:%v not found", user.ID))
+		}
+		logger.Error("error trying to get user by email and password %v", err)
+		return errors_utils.NewInternalServerError("database error")
+	}
+	return nil
 }
