@@ -14,6 +14,7 @@ func MapURL() {
 	router.GET("/internal/users/search", users_controller.Search)
 
 	router.POST("/users", users_controller.Create)
+	router.POST("/users/login", users_controller.Login)
 
 	router.PATCH("/user/:user_id", users_controller.Update)
 	router.PUT("/user/:user_id", users_controller.Update)
