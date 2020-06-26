@@ -2,6 +2,7 @@ package services
 
 import (
 	"github.com/flucas97/bookstore/users-api/model/users"
+	"github.com/flucas97/bookstore/users-api/utils/crypto_utils"
 	"github.com/flucas97/bookstore/users-api/utils/errors_utils"
 )
 
@@ -73,7 +74,7 @@ func (service usersService) Search(s string) (users.Users, *errors_utils.RestErr
 func (service usersService) LoginUser(request users.LoginRequest) (*users.User, *errors_utils.RestErr) {
 	user := &users.User{
 		Email:    request.Email,
-		Password: request.Password,
+		Password: crypto_utils.GetMd5(request.Password),
 	}
 	if err := user.FindUserByEmailAndPassword(); err != nil {
 		return nil, err

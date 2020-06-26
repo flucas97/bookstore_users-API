@@ -15,7 +15,7 @@ import (
 const (
 	queryUpdateUser             = ("UPDATE users SET first_name=?, last_name=?, email=?, password=?, created_at=?, updated_at=? WHERE id=?;")
 	queryInsertUser             = ("INSERT INTO users(first_name, last_name, email, password, status, created_at, updated_at) VALUES (?, ?, ?, ?, ?, ?, ?);")
-	queryFindUser               = (" id, first_name, last_name, email, status, created_at, updated_at FROM users WHERE id=?;")
+	queryFindUser               = ("SELECT id, first_name, last_name, email, status, created_at, updated_at FROM users WHERE id=?;")
 	queryDeleteUser             = ("DELETE FROM users WHERE id=?;")
 	queryFindByStatus           = ("SELECT id, first_name, last_name, email, created_at, updated_at, status FROM users WHERE status=?;")
 	queryFindByEmailAndPassword = ("SELECT id, first_name, last_name, email, created_at, updated_at, status FROM users WHERE email=? AND password=?;")
@@ -37,8 +37,9 @@ func (user *User) Save() *errors_utils.RestErr {
 
 	insertResult, err := stmt.Exec(user.FirstName, user.LastName, user.Email, user.Password, user.Status, user.CreatedAt, user.UpdatedAt)
 	if err != nil {
-		logger.Error("error while getting user info from database", err)
-		return errors_utils.NewInternalServerError("an error occurred while searching user. Try again")
+		if strings.Contains(err.Error(), "Duplicate entry") {
+			return errors_utils.NewBadRequestError(fmt.Sprintf("user '%v' already exists", user.Email))
+		}
 	}
 	userID, err := insertResult.LastInsertId()
 	if err != nil {
@@ -169,7 +170,7 @@ func (user *User) FindUserByEmailAndPassword() *errors_utils.RestErr {
 
 	searchResult := stmt.QueryRow(user.Email, user.Password)
 
-	if err := searchResult.Scan(&user.ID, &user.FirstName, &user.LastName, &user.Email, &user.Status, &user.CreatedAt, &user.UpdatedAt); err != nil {
+	if err := searchResult.Scan(&user.ID, &user.FirstName, &user.LastName, &user.Email, &user.CreatedAt, &user.UpdatedAt, &user.Status); err != nil {
 		if strings.Contains(err.Error(), "no rows in result set") {
 			return errors_utils.NewNotFoundError("invalid email address or password")
 		}

@@ -31,7 +31,7 @@ func Login(c *gin.Context) {
 		return
 	}
 
-	c.JSON(http.StatusOK, user)
+	c.JSON(http.StatusOK, user.Marshall(c.GetHeader("X-Public") == "true"))
 }
 
 func Create(c *gin.Context) {
@@ -46,6 +46,7 @@ func Create(c *gin.Context) {
 	result, err := usersService.Create(user)
 	if err != nil {
 		c.JSON(err.Status, err)
+		return
 	}
 
 	c.JSON(http.StatusCreated, result)
